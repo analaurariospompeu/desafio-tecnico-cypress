@@ -1,9 +1,12 @@
 describe('Gestão de operações - Aluno', () => {
+
+    beforeEach(() => {
+        cy.fazerLogin('2620101', '12345678')
+    })
+
     it('Exclusão de um aluno bem sucedida', () => {
 
         const aluno = '1112176'
-
-        cy.fazerLogin()
 
         cy.get('#student-search').type(aluno)
 
@@ -27,8 +30,6 @@ describe('Gestão de operações - Aluno', () => {
         const matriculaAluno = '1120970'
         const novoNome = 'André Ferrari'
         const novoGenero = 'Prefiro não dizer'
-
-        cy.fazerLogin()
 
         cy.get('#student-search').type(matriculaAluno)
 
@@ -57,7 +58,6 @@ describe('Gestão de operações - Aluno', () => {
     })
 
     it('Navegação pela paginação da lista de alunos', () => {
-        cy.fazerLogin()
 
         cy.contains('Página 1 de 6').should('be.visible')
 

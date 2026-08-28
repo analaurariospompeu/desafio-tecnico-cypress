@@ -1,37 +1,27 @@
 describe('Buscar alunos', () => {
 
-  it('Busca de alunos com resultados - nome', () => {
-    const nomeBusca = 'Laura'
+    beforeEach(() => {
+        cy.fazerLogin('2620101', '12345678')
+    })
 
-    cy.fazerLogin()
+  it('Busca de alunos com resultados - nome', () => {
+    const nomeBusca = 'João'
 
     cy.get('#student-search').type(nomeBusca)
 
-    cy.get('.students-table tbody tr')
-      .each(($row) => {
-        cy.wrap($row)
-          .should('contain', nomeBusca)
-      })
+    cy.get('.students-table tbody').contains('tr', nomeBusca).should('be.visible')
   })
 
   it('Busca de alunos com resultados - matricula', () => {
     const matriculaBusca = '1121105'
 
-    cy.fazerLogin()
-
     cy.get('#student-search').type(matriculaBusca)
 
-    cy.get('.students-table tbody tr')
-      .each(($row) => {
-        cy.wrap($row)
-          .should('contain', matriculaBusca)
-      })
+    cy.get('.students-table tbody').contains('tr', matriculaBusca).should('be.visible')
   })
 
   it('Busca de alunos sem resultados - nome', () => {
     const nomeBusca = 'Liane Mendes'
-
-    cy.fazerLogin()
 
     cy.get('#student-search').type(nomeBusca)
 
@@ -40,8 +30,6 @@ describe('Buscar alunos', () => {
 
   it('Busca de alunos sem resultados - matricula', () => {
     const matriculaBusca = '2653985'
-
-    cy.fazerLogin()
 
     cy.get('#student-search').type(matriculaBusca)
 
