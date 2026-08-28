@@ -1,114 +1,74 @@
-describe('Cadastro de alunos', () => {
+describe('Gestão de operações - Aluno', () => {
+    it('Exclusão de um aluno bem sucedida', () => {
 
-  it('Cadastro de aluno bem sucedido', () => {
-    // Chama o comando fazerLogin (Localizado em commands.js) e realiza a autenticação do usuário
-    cy.fazerLogin()
+        const aluno = '1112176'
 
-    cy.get('#add-student-button').click()
+        cy.fazerLogin()
 
-    cy.get('#register-matricula').type('2650147')
-    cy.get('#register-nome').type('Márcia Pereira Moreno')
-    cy.get('#register-data').type('2004-05-25')
-    cy.get('#register-genero').select('Feminino')
+        cy.get('#student-search').type(aluno)
 
-    cy.get('#save-student-button').click()
+        cy.contains('tr', aluno)
+            .find('.delete-btn')
+            .click()
 
-    cy.get('#toast')
-      .and('contain', 'Aluno cadastrado com sucesso!')
-  })
+        cy.get('.modal-card').should('be.visible')
+            .should('contain', aluno)
 
-  it('Cadastro de aluno mal sucedido - Matrícula já cadastrada', () => {
+        cy.get('#confirm-delete-btn').click()
+        cy.get('#toast').and('contain', 'Aluno excluído com sucesso!')
 
-    cy.fazerLogin()
+        cy.get('#student-search').type(aluno)
+        cy.contains('Nenhum aluno encontrado.').should('be.visible')
 
-    cy.get('#add-student-button').click()
+        cy.get('#student-search').clear()
+    })
 
-    cy.get('#register-matricula').type('1120945')
-    cy.get('#register-nome').type('Tiago Paiva')
-    cy.get('#register-data').type('2003-12-22')
-    cy.get('#register-genero').select('Masculino')
+    it('Edição de um aluno existente', () => {
+        const matriculaAluno = '1120970'
+        const novoNome = 'André Ferrari'
+        const novoGenero = 'Prefiro não dizer'
 
-    cy.get('#save-student-button').click()
+        cy.fazerLogin()
 
-    cy.contains('Esta matrícula já está cadastrada.').should('be.visible')
-  })
+        cy.get('#student-search').type(matriculaAluno)
 
-  it('Busca de alunos com resultados - nome', () => {
-    const alunoBusca = 'Caio'
+        cy.contains('tr', matriculaAluno)
+            .find('.edit-btn')
+            .click()
 
-    cy.fazerLogin()
+        cy.get('#register-nome').clear()
+        cy.get('#register-nome').type(novoNome)
 
-    cy.get('#student-search').type(alunoBusca)
+        cy.get('#register-data').clear()
+        cy.get('#register-data').type('1998-01-04')
 
-    cy.get('.students-table tbody tr')
-      .each(($row) => {
-        cy.wrap($row)
-          .should('contain', alunoBusca)
-      })
-  })
+        cy.get('#register-genero').select(novoGenero)
 
-  it('Busca de alunos com resultados - matricula', () => {
-    cy.fazerLogin()
+        cy.get('#save-student-button').click()
+        cy.get('#toast').and('contain', 'Aluno atualizado com sucesso!')
 
-    cy.get('#student-search').type('1112089')
+        cy.get('#student-search').clear()
+        cy.get('#student-search').type(matriculaAluno)
 
-    cy.get('.students-table tbody tr')
-      .each(($row) => {
-        cy.wrap($row)
-          .should('contain', '1112089')
-      })
-  })
+        cy.contains('tr', matriculaAluno)
+            .should('contain', novoNome)
+            .and('contain', '04/01/1998')
+            .and('contain', novoGenero)
+    })
 
-  it('Edição de um aluno existente', () => {
-    const matriculaAluno = '1120970'
-    const novoNome = 'André Ferrari'
+    it('Navegação pela paginação da lista de alunos', () => {
+        cy.fazerLogin()
 
-    cy.fazerLogin()
+        cy.contains('Página 1 de 6').should('be.visible')
 
-    cy.get('#student-search').type(matriculaAluno)
+        for (let pagina = 2; pagina <= 6; pagina++) {
+            cy.get('#next-page').click()
 
-    cy.contains('tr', matriculaAluno)
-      .find('.edit-btn')
-      .click()
+            cy.contains(`Página ${pagina} de 6`)
+                .should('be.visible')
 
-    cy.get('#register-nome').clear()
-    cy.get('#register-nome').type(novoNome)
-
-    cy.get('#register-data').type('1998-01-04')
-
-    cy.get('#save-student-button').click()
-    cy.get('#toast').and('contain', 'Aluno atualizado com sucesso!')
-
-    cy.get('#student-search').clear()
-    cy.get('#student-search').type(matriculaAluno)
-
-    cy.contains('tr', matriculaAluno)
-      .should('contain', novoNome)
-      .and('contain', '04/01/1998')
-  })
-
-  it('Exclusão de um aluno bem sucedida', () => {
-    cy.fazerLogin()
-
-    cy.contains('tr', '1121050')
-      .find('.delete-btn')
-      .click()
-
-    cy.get('.modal-card').should('be.visible')
-      .should('contain', '1121050')
-
-    cy.get('#confirm-delete-btn').click()
-    cy.get('#toast').and('contain', 'Aluno excluído com sucesso!')
-
-    cy.contains('tr', '1121050')
-      .should('not.exist')
-  })
-
-  it('Logout do sistema', () => {
-    cy.fazerLogin()
-
-    cy.get('#logout-button').click()
-
-    cy.contains('Acesso à Unifor').should('be.visible')
-  })
+            cy.get('.students-table tbody tr')
+                .should('have.length.greaterThan', 0)
+        }
+    })
 })

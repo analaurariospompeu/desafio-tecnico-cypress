@@ -9,7 +9,6 @@ Cypress.Commands.add('fazerLogin', () => {
 
     cy.get('#login-submit-btn').click()
 
-    // Verificar se o usuário foi direcionado corretamente através de elementos da tela de listagem de alunos
-    cy.contains('Alunos').should('be.visible')
+    cy.get('#student-search').should('be.visible')
     cy.get('.students-table').should('be.visible')
 })
